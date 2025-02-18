@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <title>Admin Page</title>
+</head>
+<body>
+  <div class="container mt-3">
+    <h3 class="mt-5 mb-3">신규 등록 상품</h3>
+    <form class="row row-cols-lg-auto g-3 align-items-center">      
+      <div class="col-12">
+        <label class="visually-hidden" for="inlineFormSelectPref">Preference</label>
+        <select class="form-select" id="inlineFormSelectPref" name="category_data_table" onchange="filterProducts()">
+          <!-- 셀렉트요소의 name="category_data_table"은 지우거나 변경하면 안돼요 -->
+          <!-- 카테고리 셀렉트 코드를 넣어주세요 -->
+           <option value="">카테고리</option>
+           <option value="상의">상의</option>
+           <option value="하의">하의</option>
+           <option value="신발">신발</option>
+           <option value="패션잡화">패션잡화</option>
+        </select>
+      </div>
+      <div class="col-3">
+        <!-- input 입력창 코드를 넣어주세요 -->
+         <input type="text" class="form-control" id="productSearch" placeholder="제품명을 입력해주세요" oninput="filterProducts()">
+      </div>
+      <div class="col-auto">
+        <!-- 조회 버튼 코드를 넣어주세요 -->
+        <button type="button" class="btn btn-success w-100" title="조회버튼은 장식용 ㅋ" onclick="filterProducts()">조회</button>
+        <style>
+            .btn:hover {
+              background-color: #096919;
+            }
+          </style>
+      </div>
+    </form>
+
+    <div class="container mt-3">
+      <table class="table table-sm">
+        <thead>
+          <!-- 열의 속성값을 나타내는 코드를 작성해주세요 (예 : 카테고리, 브랜드, 상품명, 가격) -->
+           
+          <td><strong>카테고리</strong></td>
+          <td><strong>브랜드</strong></td>
+          <td><strong>상품명</strong></td>
+          <td><strong>가격</strong></td>
+        </thead>
+        <tbody id="product_data_Table">
+          <!-- tbody요소의 id="product_data_Table" 는 지우거나 변경하면 안돼요! -->
+          <!-- 제품 데이터가 여기 추가됩니다. -->
+        </tbody>
+      </table>
+    </div>
+    <!-- 페이지 네이션 코드를 넣어주세요 -->
+  </div>
+
+  <script>
+    // 제품 데이터
+    const product_data = [
+    { "category": "상의", "brand": "Supreme", "product": "박스로고 후드티", "price": "390,000" },
+    { "category": "하의", "brand": "Adidas", "product": "트랙 팬츠", "price": "150,000" },
+    { "category": "신발", "brand": "Nike", "product": "에어맥스 97", "price": "199,000" },
+    { "category": "패션잡화", "brand": "Music&Goods", "product": "레트로 백팩", "price": "45,000" },
+    { "category": "상의", "brand": "Puma", "product": "스포츠 반팔티", "price": "69,000" },
+    { "category": "하의", "brand": "Levi's", "product": "스트레이트 팬츠", "price": "99,000" },
+    { "category": "신발", "brand": "Adidas", "product": "슈퍼스타", "price": "130,000" },
+    { "category": "패션잡화", "brand": "Uniqlo", "product": "슬림벨트", "price": "12,000" },
+    { "category": "상의", "brand": "The North Face", "product": "후드 집업", "price": "129,000" },
+    { "category": "하의", "brand": "Zara", "product": "조거 팬츠", "price": "79,000" },
+    { "category": "신발", "brand": "New Balance", "product": "990v5", "price": "220,000" },
+    { "category": "패션잡화", "brand": "Coach", "product": "레더 장지갑", "price": "350,000" },
+    { "category": "상의", "brand": "Stussy", "product": "그래픽 반팔티", "price": "80,000" },
+    { "category": "하의", "brand": "Bershka", "product": "슬림핏 청바지", "price": "45,000" },
+    { "category": "신발", "brand": "Reebok", "product": "클래식 레더", "price": "110,000" },
+    { "category": "패션잡화", "brand": "Fila", "product": "스포츠 캡", "price": "25,000" },
+    { "category": "상의", "brand": "Champion", "product": "로고 맨투맨", "price": "89,000" },
+    { "category": "하의", "brand": "Nike", "product": "플렉스 트랙 팬츠", "price": "119,000" },
+    { "category": "신발", "brand": "Vans", "product": "올드스쿨", "price": "95,000" },
+    { "category": "패션잡화", "brand": "H&M", "product": "러닝 시계", "price": "19,000" },
+    { "category": "상의", "brand": "Adidas", "product": "테크핏 티셔츠", "price": "65,000" },
+    { "category": "하의", "brand": "Tommy Hilfiger", "product": "카고 팬츠", "price": "120,000" },
+    { "category": "신발", "brand": "Under Armour", "product": "커맨드 트레일", "price": "150,000" },
+    { "category": "패션잡화", "brand": "Tory Burch", "product": "로고 토트백", "price": "300,000" },
+    { "category": "상의", "brand": "Lacoste", "product": "피케 셔츠", "price": "98,000" },
+    { "category": "하의", "brand": "Wrangler", "product": "청반바지", "price": "59,000" },
+    { "category": "신발", "brand": "Converse", "product": "척 70", "price": "85,000" },
+    { "category": "패션잡화", "brand": "Kate Spade", "product": "클러치백", "price": "250,000" },
+    { "category": "상의", "brand": "Carhartt", "product": "워크 자켓", "price": "140,000" },
+    { "category": "하의", "brand": "Dockers", "product": "슬랙스", "price": "75,000" },
+    { "category": "신발", "brand": "Skechers", "product": "고스트 14", "price": "110,000" },
+    { "category": "패션잡화", "brand": "Michael Kors", "product": "지갑", "price": "220,000" },
+    { "category": "상의", "brand": "Ralph Lauren", "product": "폴로 티셔츠", "price": "150,000" },
+    { "category": "하의", "brand": "Uniqlo", "product": "데님 팬츠", "price": "59,000" },
+    { "category": "신발", "brand": "Asics", "product": "젤-카야노", "price": "170,000" },
+    { "category": "패션잡화", "brand": "Gucci", "product": "GG 마몬트 벨트백", "price": "650,000" },
+    { "category": "상의", "brand": "Patagonia", "product": "플리스 자켓", "price": "180,000" },
+    { "category": "하의", "brand": "Hollister", "product": "반바지", "price": "39,000" },
+    { "category": "신발", "brand": "Puma", "product": "스웨이드 클래식", "price": "120,000" },
+    { "category": "패션잡화", "brand": "MCM", "product": "피카부 백팩", "price": "500,000" },
+    { "category": "상의", "brand": "Nike", "product": "드라이핏 반팔티", "price": "49,000" },
+    { "category": "하의", "brand": "Diesel", "product": "슬림핏 청바지", "price": "120,000" },
+    { "category": "신발", "brand": "Jordan", "product": "1 로우", "price": "230,000" },
+    { "category": "패션잡화", "brand": "Marc Jacobs", "product": "레더 토트백", "price": "350,000" },
+    { "category": "상의", "brand": "Bape", "product": "카모 후디", "price": "260,000" },
+    { "category": "하의", "brand": "Fila", "product": "조거 팬츠", "price": "79,000" },
+    { "category": "신발", "brand": "Reebok", "product": "클래식 레더", "price": "110,000" },
+    { "category": "패션잡화", "brand": "Tiffany", "product": "시그니처 팔찌", "price": "500,000" },
+    { "category": "상의", "brand": "Tommy Jeans", "product": "컬러블록 후디", "price": "110,000" },
+    { "category": "하의", "brand": "Levi's", "product": "레귤러핏 팬츠", "price": "85,000" },
+    { "category": "신발", "brand": "Vans", "product": "슬립온", "price": "75,000" },
+    { "category": "패션잡화", "brand": "Swarovski", "product": "크리스탈 목걸이", "price": "150,000" },
+    { "category": "상의", "brand": "Arcteryx", "product": "고어텍스 자켓", "price": "250,000" },
+    { "category": "하의", "brand": "Moncler", "product": "다운 팬츠", "price": "350,000" },
+    { "category": "신발", "brand": "Balenciaga", "product": "슬라이드", "price": "400,000" },
+    { "category": "패션잡화", "brand": "Bvlgari", "product": "디지털 시계", "price": "500,000" },
+    { "category": "상의", "brand": "Under Armour", "product": "기능성 티셔츠", "price": "79,000" },
+    { "category": "하의", "brand": "Carhartt", "product": "쿨워크 팬츠", "price": "120,000" },
+    { "category": "신발", "brand": "Skechers", "product": "골프 슈즈", "price": "130,000" },
+    { "category": "패션잡화", "brand": "Chanel", "product": "마트라세 퀼팅 백", "price": "1,200,000" },
+    { "category": "상의", "brand": "Adidas", "product": "어드벤쳐 자켓", "price": "130,000" },
+    { "category": "하의", "brand": "Zara", "product": "베이직 슬랙스", "price": "45,000" },
+    { "category": "신발", "brand": "Nike", "product": "프리몬트", "price": "100,000" },
+    { "category": "패션잡화", "brand": "Louis Vuitton", "product": "보드리 장지갑", "price": "800,000" }];
+    
+    // 제품 테이블을 초기화하는 함수
+    function loadProducts(filteredData) {
+      const product_data_Table = document.getElementById('product_data_Table');
+      product_data_Table.innerHTML = ""; // 테이블 내용 초기화
+    
+      // 데이터가 없을 경우, '데이터가 없습니다' 메시지를 출력
+      if (filteredData.length === 0) {
+        const row = product_data_Table.insertRow();
+        const cell = row.insertCell(0);
+        cell.colSpan = 4; // 모든 열을 합쳐서 메시지 표시
+        cell.innerHTML = "데이터가 없습니다."; // 데이터가 없을 때 메시지 표시
+        return;
+      }
+    
+      // 필터링된 데이터로 테이블 업데이트
+      filteredData.forEach(item => {
+        const row = product_data_Table.insertRow();
+        row.insertCell(0).innerHTML = item.category;
+        row.insertCell(1).innerHTML = item.brand;
+        row.insertCell(2).innerHTML = item.product;
+        row.insertCell(3).innerHTML = item.price;
+      });
+    }
+    
+    // 조회 버튼 클릭 시 호출되는 함수
+    function filterProducts() {
+      const category = document.getElementById('inlineFormSelectPref').value;
+      const productName = document.getElementById('productSearch').value.toLowerCase();
+    
+      // 카테고리와 상품명에 맞는 제품만 필터링
+      const filteredProducts = product_data.filter(item => {
+        const matchesCategory = category === "" || item.category === category;
+        const matchesProductName = item.product.toLowerCase().includes(productName);
+        return matchesCategory && matchesProductName;
+      });
+    
+      // 필터링된 데이터로 제품 테이블 업데이트
+      loadProducts(filteredProducts);
+    }
+    
+    // 페이지 로드 시 기본 데이터 로딩
+    window.onload = () => {
+      loadProducts(product_data); // 페이지 로드 시 모든 제품을 보여줌
+    };
+    </script>
+    
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
